@@ -1,9 +1,5 @@
 import socket
-
-def server_init(port_number, hostname):
-    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.bind((hostname, port_number))
-    server.listen()
+import threading
 
 def broadcast(message, clients):
     for client in clients:
@@ -19,9 +15,27 @@ def handle(client, clients, nicknames):
             clients.remove(client)
             client.close()
             nickname = nicknames[index]
-            broadcast(f'{nickname} has left the chat!'.encode('ascii'))
+            broadcast(f"{nickname} has left the chat!".encode("ascii"))
             nicknames.remove(nickname)
             break
+
+def receive(server, clients, nicknames):
+    while True:
+        client, address = server.accept()
+        print(f"SERVER: Connection with {str(address)} has been established!")
+
+        client.send("NICK".encode("ascii"))
+        nickname = client.recv(1024).encode("ascii")
+        nicknames.append(nickname)
+        clients.append(client)
+
+        print(f"Nickname of the client is {nickname}!")
+        broadcast(f"Welcome to the chat server, {nickname}!".encode("ascii"))
+        client.send("Connected to the server!".encode("ascii"))
+
+        thread = threading.Thread(target=handle, args=(client,))
+        thread.start()
+
 
 def main():
     """
@@ -34,7 +48,12 @@ def main():
         print("SERVER: Please input a valid number")
         port = int(input())
     print("SERVER: Initializing server... Please wait...")
-    server_init(port, '127.0.0.1')
+    server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server.bind(('127.0.0.1', port))
+    server.listen()
     clients = []
     nicknames = []
-    return None
+    print("SERVER: Listening...")
+    receive(server, clients, nicknames)
+
+main()
