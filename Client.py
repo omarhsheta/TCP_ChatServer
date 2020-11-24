@@ -26,9 +26,10 @@ def main():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     print("CLIENT: Please enter a proper port number...")
     port = int(input())
+    address = input()
     try:
         nickname = input("CLIENT: Please enter your nickname...")
-        client.connect(('127.0.0.1', port))
+        client.connect((address, port))
         receive_thread = threading.Thread(target=receive, args=(client, nickname,))
         receive_thread.start()
 

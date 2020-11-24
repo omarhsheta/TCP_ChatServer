@@ -1,7 +1,7 @@
 import socket
 import threading
 
-host = '127.0.0.1'
+host = ''
 port = int(input("SERVER: Please input any port number between 0 to 65535."))
 while (port < 0 or port > 65535):
     print("SERVER: Please input a valid number")
