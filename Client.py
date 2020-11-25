@@ -24,19 +24,20 @@ def write(client, nickname):
 
 def main():
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    print("CLIENT: Please enter a proper port number...")
-    port = int(input())
-    address = input()
     try:
-        nickname = input("CLIENT: Please enter your nickname...")
-        client.connect((address, port))
-        receive_thread = threading.Thread(target=receive, args=(client, nickname,))
-        receive_thread.start()
+        port = int(input("CLIENT: Please enter a proper port number..."))
+        address = input("CLIENT: Please enter the chat server's IP Address")
+        try:
+            nickname = input("CLIENT: Please enter your nickname...")
+            client.connect((address, port))
+            receive_thread = threading.Thread(target=receive, args=(client, nickname,))
+            receive_thread.start()
 
-        write_thread = threading.Thread(target=write, args=(client, nickname,))
-        write_thread.start()
-    except:
-        print("ERROR: Couldn't find server... Closing client!")
-        client.close()
-
+            write_thread = threading.Thread(target=write, args=(client, nickname,))
+            write_thread.start()
+        except:
+            print("ERROR: Couldn't find server... Closing client!")
+            client.close()
+    except ValueError:
+        print("ERROR: Invalid port number, closing the client!")
 main()
